@@ -1,0 +1,1302 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1f2430;
+  background: #f7f5ef;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #f7f5ef; }
+button, input { font: inherit; }
+
+main {
+  min-height: 100vh;
+  background: #eef4f7;
+}
+
+.hero {
+  width: min(1380px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 54px 0 34px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 220px;
+  gap: 28px;
+  align-items: end;
+}
+
+.eyebrow {
+  letter-spacing: .16em;
+  font-size: 12px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+h1 {
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: .98;
+  margin: 0;
+  max-width: 740px;
+  letter-spacing: -.045em;
+}
+
+.hero-copy {
+  max-width: 610px;
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: .72;
+  margin: 20px 0 0;
+}
+
+.progress-card {
+  min-width: 220px;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(35,40,48,.12);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 14px 40px rgba(50,55,65,.08);
+}
+
+.progress-card span { display: block; font-size: 12px; font-weight: 700; opacity: .58; text-transform: uppercase; letter-spacing: .08em; }
+.progress-card strong { display: block; font-size: 34px; margin-top: 6px; }
+.progress-track { height: 7px; background: #e1e4df; border-radius: 99px; overflow: hidden; margin: 10px 0 15px; }
+.progress-fill { height: 100%; background: #406854; border-radius: inherit; transition: width .35s ease; }
+.progress-card button {
+  border: 0; background: transparent; padding: 0; display: flex; align-items: center; gap: 6px;
+  font-size: 12px; opacity: .62; cursor: pointer;
+}
+
+.progress-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.progress-actions button.active {
+  opacity: 1;
+  font-weight: 750;
+}
+
+.timeline-shell {
+  width: min(1380px, calc(100% - 48px));
+  margin: 0 auto;
+  position: relative;
+  padding: 30px 0 120px;
+}
+
+.timeline-line {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 70px;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  background: linear-gradient(#283540, #71817a 75%, rgba(113,129,122,.25));
+  border-radius: 99px;
+}
+
+.month {
+  position: relative;
+  /* Grow with added primary targets so a month can never spill into the next one. */
+  min-height: max(520px, calc(145px + (var(--target-count) * 132px)));
+  padding-bottom: 34px;
+  isolation: isolate;
+}
+
+/* Each month owns its full-width background band.
+   Because this pseudo-element fills the actual month section,
+   the color automatically grows whenever the month gets taller. */
+.month::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--month-bg);
+  pointer-events: none;
+}
+
+.month-label {
+  position: sticky;
+  top: 24px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  z-index: 4;
+}
+.month-label span { font-weight: 900; letter-spacing: .12em; font-size: 13px; }
+.month-label small { opacity: .55; margin-top: 4px; }
+
+.month-node {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.month-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #f7f5ef; border: 4px solid #283540;
+  box-shadow: 0 0 0 6px rgba(247,245,239,.72);
+}
+
+.targets { padding-top: 16px; }
+
+
+.target {
+  width: calc(50% - 76px);
+  position: relative;
+  margin-bottom: 60px;
+  min-height: 72px;
+  animation: rise .45s ease both;
+  animation-delay: var(--delay);
+  overflow: visible;
+}
+
+.target.left {
+  margin-right: calc(50% + 76px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.target.right {
+  margin-left: calc(50% + 76px);
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Main branch from central timeline */
+.target::before {
+  content: "";
+  position: absolute;
+  top: 31px;
+  width: 76px;
+  height: 36px;
+  pointer-events: none;
+}
+
+.target.left::before {
+  right: -76px;
+  border-top: 2px solid #7b817d;
+  border-right: 2px solid #7b817d;
+  border-top-right-radius: 34px;
+}
+
+.target.right::before {
+  left: -76px;
+  border-top: 2px solid #7b817d;
+  border-left: 2px solid #7b817d;
+  border-top-left-radius: 34px;
+}
+
+.target::after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f7f5ef;
+  border: 3px solid #4d5e57;
+  z-index: 3;
+}
+
+.target.left::after { right: -84px; }
+.target.right::after { left: -84px; }
+
+.target-main {
+  width: 300px;
+  min-height: 66px;
+  border: 0;
+  background: rgba(255,255,255,.46);
+  padding: 13px 14px;
+  border-radius: 15px;
+  box-shadow: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+  transition: transform .18s ease, background .18s ease;
+  position: relative;
+  z-index: 5;
+}
+
+.target.left .target-main { text-align: right; }
+.target-main:hover { background: rgba(255,255,255,.7); }
+.target.left .target-main:hover { transform: translateX(-3px); }
+.target.right .target-main:hover { transform: translateX(3px); }
+.target.complete .target-main { background: rgba(224,238,229,.68); }
+
+.target-title { display: block; font-weight: 850; font-size: 18px; }
+.target-subtitle { display: block; margin-top: 4px; font-size: 13px; opacity: .62; line-height: 1.4; }
+.target-progress { font-weight: 800; font-size: 13px; opacity: .62; }
+
+/* No dropdown stem anymore */
+.branch-stem { display: none; }
+
+/* Second-level branches fan organically from the main target */
+.task-panel {
+  position: absolute;
+  top: 2px;
+  width: 390px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .24s ease;
+  z-index: 4;
+}
+
+.task-panel.right {
+  left: 300px;
+  padding-left: 90px;
+  transform: translateX(-14px);
+}
+
+.task-panel.left {
+  right: 300px;
+  padding-right: 90px;
+  transform: translateX(14px);
+}
+
+.task-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+/* One SVG contains all smooth curves; no extra straight trunk or duplicate CSS lines */
+.branch-fan {
+  position: absolute;
+  top: 0;
+  width: 90px;
+  height: 100%;
+  min-height: 70px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.task-panel.right .branch-fan {
+  left: 0;
+}
+
+.task-panel.left .branch-fan {
+  right: 0;
+}
+
+.branch-fan path {
+  fill: none;
+  stroke: rgba(72,80,78,.48);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+
+  /* long dash creates a "draw from root to tip" effect */
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+}
+
+.task-panel.open .branch-fan path {
+  animation: growBranch .48s cubic-bezier(.22,.8,.28,1) forwards;
+}
+
+.task-panel.open .branch-fan path:nth-child(2) {
+  animation-delay: .06s;
+}
+
+.task-panel.open .branch-fan path:nth-child(3) {
+  animation-delay: .12s;
+}
+
+.task-panel.open .branch-fan path:nth-child(4) {
+  animation-delay: .18s;
+}
+
+.task-group {
+  position: relative;
+  margin-bottom: 34px;
+  min-height: 44px;
+
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+.task-panel.left .task-group {
+  transform: translateX(8px);
+}
+
+.task-panel.open .task-group {
+  animation: revealBranchNode .30s ease forwards;
+  animation-delay: calc(.20s + (var(--branch-index) * .08s));
+}
+
+/* No CSS elbow connectors here; SVG curves handle the geometry */
+.task-group::before {
+  display: none;
+}
+
+.branch-node {
+  display: none;
+}
+
+.subtarget {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.task-panel.left .subtarget {
+  grid-template-columns: auto 1fr auto;
+  text-align: right;
+  direction: rtl;
+}
+
+.task-panel.left .subtarget > * {
+  direction: ltr;
+}
+
+.subtarget:hover {
+  background: rgba(255,255,255,.42);
+}
+
+.task-panel.right .subtarget:hover {
+  transform: translateX(3px);
+}
+
+.task-panel.left .subtarget:hover {
+  transform: translateX(-3px);
+}
+
+.subtarget.done {
+  background: rgba(220,236,225,.46);
+}
+
+.subtarget svg {
+  transition: transform .2s ease;
+}
+
+.subtarget svg.rotated {
+  transform: rotate(90deg);
+}
+
+.subtarget span {
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.subtarget em {
+  font-style: normal;
+  font-size: 11px;
+  opacity: .5;
+}
+
+/* Third-level tasks continue outward with the SAME organic branch style */
+.leaf-list {
+  position: absolute;
+  top: 0;
+  width: 360px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .22s ease;
+  min-height: 52px;
+}
+
+.leaf-list.right {
+  left: 300px;
+  padding-left: 82px;
+  transform: translateX(-12px);
+}
+
+.leaf-list.left {
+  right: 300px;
+  padding-right: 82px;
+  transform: translateX(12px);
+}
+
+.leaf-list.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+/* Smooth peripheral Bézier branches */
+.leaf-branch-fan {
+  position: absolute;
+  top: 0;
+  width: 82px;
+  height: 100%;
+  min-height: 52px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.leaf-list.right .leaf-branch-fan {
+  left: 0;
+}
+
+.leaf-list.left .leaf-branch-fan {
+  right: 0;
+}
+
+.leaf-branch-fan path {
+  fill: none;
+  stroke: rgba(72,80,78,.42);
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 190;
+  stroke-dashoffset: 190;
+}
+
+.leaf-list.open .leaf-branch-fan path {
+  animation: growLeafBranch .42s cubic-bezier(.22,.8,.28,1) forwards;
+}
+
+.leaf-list.open .leaf-branch-fan path:nth-child(2) { animation-delay: .045s; }
+.leaf-list.open .leaf-branch-fan path:nth-child(3) { animation-delay: .09s; }
+.leaf-list.open .leaf-branch-fan path:nth-child(4) { animation-delay: .135s; }
+.leaf-list.open .leaf-branch-fan path:nth-child(5) { animation-delay: .18s; }
+.leaf-list.open .leaf-branch-fan path:nth-child(6) { animation-delay: .225s; }
+
+.leaf {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: center;
+  padding: 7px 6px;
+  cursor: pointer;
+  position: relative;
+  min-height: 40px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  opacity: 0;
+  transition: background .16s ease, transform .16s ease;
+}
+
+.leaf-list.left .leaf {
+  grid-template-columns: 1fr auto;
+  text-align: right;
+}
+
+.leaf-list.left .leaf .check-box {
+  grid-column: 2;
+}
+
+.leaf-list.left .leaf .leaf-text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.leaf:hover {
+  background: rgba(255,255,255,.35);
+}
+
+.leaf-list.right .leaf:hover {
+  transform: translateX(3px);
+}
+
+.leaf-list.left .leaf:hover {
+  transform: translateX(-3px);
+}
+
+.leaf-list.open .leaf {
+  animation: revealLeafOrganic .26s ease forwards;
+  animation-delay: calc(.16s + (var(--leaf-index) * .055s));
+}
+
+.leaf input {
+  display: none;
+}
+
+.check-box {
+  margin-top: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid #757e79;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: .18s ease;
+  background: rgba(247,245,239,.92);
+}
+
+.leaf input:checked + .check-box {
+  background: #406854;
+  color: white;
+  border-color: #406854;
+}
+
+.leaf-text {
+  font-size: 12.5px;
+  line-height: 1.4;
+  opacity: .78;
+}
+
+.leaf input:checked ~ .leaf-text {
+  text-decoration: line-through;
+  opacity: .48;
+}
+
+.month-spacer { height: 22px; }
+
+
+
+@keyframes growLeafBranch {
+  from { stroke-dashoffset: 190; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes revealLeafOrganic {
+  from {
+    opacity: 0;
+    transform: translateX(-7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.leaf-list.left.open .leaf {
+  animation-name: revealLeafOrganicLeft;
+}
+
+@keyframes revealLeafOrganicLeft {
+  from {
+    opacity: 0;
+    transform: translateX(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes growBranch {
+  from { stroke-dashoffset: 220; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes revealBranchNode {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.task-panel.left.open .task-group {
+  animation-name: revealBranchNodeLeft;
+}
+
+@keyframes revealBranchNodeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 820px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100% - 28px, 680px);
+    padding-top: 34px;
+  }
+
+  .progress-card { min-width: 0; }
+
+  .timeline-shell { width: min(100% - 28px, 680px); }
+
+  .timeline-line { left: 74px; }
+
+  .month-label { width: 60px; }
+
+  .month-label span {
+    font-size: 10px;
+    letter-spacing: .06em;
+  }
+
+  .month-node { left: 74px; }
+
+  .target,
+  .target.left,
+  .target.right {
+    width: calc(100% - 104px);
+    margin-left: 104px;
+    margin-right: 0;
+    display: block;
+    min-height: 72px;
+    margin-bottom: 44px;
+  }
+
+  .target-main {
+    width: min(300px, 100%);
+    text-align: left !important;
+  }
+
+  .target::before,
+  .target.left::before,
+  .target.right::before {
+    width: 30px;
+    left: -30px;
+    right: auto;
+    border: 0;
+    border-top: 2px solid #7b817d;
+  }
+
+  .target::after,
+  .target.left::after,
+  .target.right::after {
+    left: -38px;
+    right: auto;
+  }
+
+  .branch-fan,
+  .leaf-branch-fan {
+    display: none;
+  }
+
+  .task-group,
+  .task-panel.left .task-group {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+
+  .task-panel,
+  .task-panel.left,
+  .task-panel.right {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+    margin-top: 14px;
+    transform: translateY(-6px);
+  }
+
+  .task-panel.open {
+    transform: translateY(0);
+  }
+
+  .task-group {
+    margin-left: 28px;
+    margin-bottom: 10px;
+  }
+
+  .task-group::before {
+    display: block;
+  }
+
+  .task-panel.left .task-group::before,
+  .task-panel.right .task-group::before {
+    left: -28px;
+    right: auto;
+    width: 28px;
+    border: 0;
+    border-top: 1.5px solid rgba(72,80,78,.35);
+  }
+
+  .task-panel.left .branch-node,
+  .task-panel.right .branch-node {
+    left: -34px;
+    right: auto;
+  }
+
+  .task-panel.left .subtarget {
+    direction: ltr;
+    text-align: left;
+  }
+
+  .leaf-list,
+  .leaf-list.left,
+  .leaf-list.right {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+    margin-top: 4px;
+    transform: translateY(-4px);
+  }
+
+  .leaf-list.open {
+    transform: translateY(0);
+  }
+
+  .leaf-list.left .leaf,
+  .leaf-list.right .leaf {
+    grid-template-columns: auto 1fr;
+    padding: 8px 8px 8px 36px;
+    text-align: left;
+  }
+
+  .leaf-list.left .leaf .check-box,
+  .leaf-list.left .leaf .leaf-text {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .leaf-list .leaf,
+  .leaf-list.open .leaf {
+    opacity: 1;
+    animation: none !important;
+  }
+
+}
+
+
+/* =============================
+   ROADMAP EDIT MODE
+   ============================= */
+
+.edit-add,
+.edit-icon {
+  border: 1px solid rgba(72,80,78,.22);
+  background: rgba(255,255,255,.82);
+  color: #46534d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  z-index: 30;
+}
+
+.edit-add:hover,
+.edit-icon:hover {
+  transform: scale(1.07);
+  background: #fff;
+  border-color: rgba(72,80,78,.42);
+}
+
+.edit-icon.trash:hover {
+  color: #8b423d;
+  border-color: rgba(139,66,61,.35);
+  background: #fff7f6;
+}
+
+.month-add {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  margin-top: 12px;
+}
+
+.target-edit-tools {
+  position: absolute;
+  top: -12px;
+  display: flex;
+  gap: 5px;
+  z-index: 20;
+}
+
+.target-edit-tools.left { left: 0; }
+.target-edit-tools.right { right: 0; }
+
+.edit-icon {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
+.subtarget-edit-tools {
+  position: absolute;
+  top: -12px;
+  display: flex;
+  gap: 4px;
+  z-index: 35;
+}
+
+.subtarget-edit-tools.right { right: 0; }
+.subtarget-edit-tools.left { left: 0; }
+
+.subtarget-edit-tools .edit-icon {
+  width: 23px;
+  height: 23px;
+}
+
+.leaf-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: center;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.leaf-list.left .leaf-check {
+  grid-template-columns: 1fr auto;
+}
+
+.leaf-list.left .leaf-check .check-box {
+  grid-column: 2;
+}
+
+.leaf-list.left .leaf-check .leaf-text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.leaf {
+  grid-template-columns: 1fr auto !important;
+}
+
+.leaf-trash {
+  width: 23px;
+  height: 23px;
+  opacity: .78;
+}
+
+.editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(24,30,33,.30);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.editor-modal {
+  width: min(440px, 100%);
+  background: rgba(250,250,247,.98);
+  border: 1px solid rgba(37,44,48,.13);
+  border-radius: 24px;
+  box-shadow: 0 30px 90px rgba(27,35,38,.18);
+  padding: 28px;
+  position: relative;
+}
+
+.editor-close {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(31,36,48,.06);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.editor-kicker {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .14em;
+  opacity: .55;
+}
+
+.editor-modal h2 {
+  font-size: 26px;
+  line-height: 1.1;
+  margin: 0 40px 24px 0;
+  letter-spacing: -.025em;
+}
+
+.editor-field {
+  display: block;
+  margin-bottom: 17px;
+}
+
+.editor-field > span {
+  display: block;
+  font-size: 12px;
+  font-weight: 760;
+  margin-bottom: 7px;
+  opacity: .68;
+}
+
+.editor-field input {
+  width: 100%;
+  border: 1px solid rgba(49,58,62,.16);
+  border-radius: 12px;
+  background: white;
+  padding: 12px 13px;
+  outline: none;
+}
+
+.editor-field input:focus {
+  border-color: rgba(64,104,84,.48);
+  box-shadow: 0 0 0 3px rgba(64,104,84,.08);
+}
+
+.side-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.side-picker button {
+  border: 1px solid rgba(49,58,62,.15);
+  background: white;
+  padding: 10px 12px;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.side-picker button.selected {
+  background: #e4ece7;
+  border-color: rgba(64,104,84,.35);
+  font-weight: 760;
+}
+
+.editor-save {
+  width: 100%;
+  margin-top: 5px;
+  border: 0;
+  border-radius: 13px;
+  background: #406854;
+  color: white;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.editor-save:disabled {
+  opacity: .38;
+  cursor: default;
+}
+
+@media (max-width: 820px) {
+  .target-edit-tools {
+    left: auto !important;
+    right: 0 !important;
+  }
+
+  .subtarget-edit-tools {
+    left: auto !important;
+    right: 0 !important;
+  }
+
+  .leaf-list.left .leaf-check,
+  .leaf-list.right .leaf-check {
+    grid-template-columns: auto 1fr;
+  }
+
+  .leaf-list.left .leaf-check .check-box,
+  .leaf-list.left .leaf-check .leaf-text {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+
+/* =========================================================
+   VERSION 9 — CONTEXTUAL EDIT CONTROLS
+   ========================================================= */
+
+/* Primary target controls: hidden unless hovering the primary card itself */
+.target-edit-tools {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(3px) scale(.96);
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.target-main:hover + .target-edit-tools,
+.target-main:focus-visible + .target-edit-tools,
+.target-edit-tools:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Keep primary controls close to the card and clearly associated with it */
+.target-edit-tools.left {
+  left: auto !important;
+  right: 8px !important;
+  top: -15px;
+}
+
+.target-edit-tools.right {
+  right: auto !important;
+  left: 8px !important;
+  top: -15px;
+}
+
+/* Secondary branch controls: only while hovering that exact subtarget */
+.subtarget-edit-tools {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(3px) scale(.96);
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.subtarget:hover + .subtarget-edit-tools,
+.subtarget:focus-visible + .subtarget-edit-tools,
+.subtarget-edit-tools:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Peripheral task trash icon: only while hovering that exact task */
+.leaf-trash {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: scale(.94);
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.leaf:hover .leaf-trash,
+.leaf:focus-within .leaf-trash,
+.leaf-trash:hover {
+  opacity: .9 !important;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Don't let edit buttons keep an unrelated branch's controls visible */
+.task-group:hover > .subtarget-edit-tools {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.task-group > .subtarget:hover + .subtarget-edit-tools,
+.task-group > .subtarget-edit-tools:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* On touch/mobile, keep controls visible while Edit Roadmap is active;
+   hover isn't reliable there. */
+@media (hover: none), (max-width: 820px) {
+  .target-edit-tools,
+  .subtarget-edit-tools {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .leaf-trash {
+    opacity: .78 !important;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
+
+/* VERSION 11 — EDIT EXISTING TARGETS */
+.edit-icon.edit:hover {
+  color: #355f4d;
+  border-color: rgba(53,95,77,.35);
+  background: #f3faf6;
+}
+
+.leaf-edit-tools {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(.96);
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.leaf:hover .leaf-edit-tools,
+.leaf:focus-within .leaf-edit-tools,
+.leaf-edit-tools:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.leaf-edit,
+.leaf-trash {
+  opacity: 1 !important;
+  pointer-events: auto;
+  width: 23px;
+  height: 23px;
+}
+
+@media (hover: none), (max-width: 820px) {
+  .leaf-edit-tools {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
+
+/* VERSION 12 — HOVER + DYNAMIC MONTH FIXES */
+.leaf-list:not(.open) {
+  visibility: hidden;
+}
+
+.leaf-list.open {
+  visibility: visible;
+}
+
+/* Month background/region grows with its content rather than using a fixed visual slice. */
+.month:last-child {
+  padding-bottom: 90px;
+}
+
+
+/* VERSION 13 — DYNAMIC MONTH COLOR BANDS */
+.month > * {
+  position: relative;
+  z-index: 1;
+}
+
+.month .targets {
+  position: relative;
+  z-index: 3;
+}
+
+.month .month-node,
+.month .month-label {
+  z-index: 4;
+}
+
+
+/* =========================================================
+   VERSION 14 — TIMELINE SWITCHER
+   ========================================================= */
+
+.timeline-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(255,255,255,.58);
+  border: 1px solid rgba(31,36,48,.10);
+  border-radius: 999px;
+  align-self: end;
+  margin-bottom: 2px;
+}
+
+.timeline-switcher button {
+  border: 0;
+  background: transparent;
+  color: #4f5862;
+  padding: 9px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 720;
+  white-space: nowrap;
+  transition: background .16s ease, color .16s ease, transform .16s ease;
+}
+
+.timeline-switcher button:hover {
+  background: rgba(255,255,255,.72);
+}
+
+.timeline-switcher button.active {
+  background: #26323a;
+  color: white;
+}
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .timeline-switcher {
+    justify-self: start;
+    align-self: auto;
+  }
+
+  .progress-card {
+    width: min(260px, 100%);
+  }
+}
+
+@media (max-width: 520px) {
+  .timeline-switcher {
+    width: 100%;
+  }
+
+  .timeline-switcher button {
+    flex: 1 1 0;
+    white-space: normal;
+  }
+}
+
+
+/* =========================================================
+   VERSION 15 — REMOVE TIMELINE NODE CIRCLES
+   ========================================================= */
+
+/* Month marker circles on the left */
+.month-node {
+  display: none !important;
+}
+
+/* Main timeline connection circles */
+.target-node,
+.timeline-node,
+.branch-node,
+.target-anchor,
+.branch-anchor {
+  display: none !important;
+}
+
+/* Catch the actual small circular markers generated on target rows */
+.target-row::before,
+.target-row::after,
+.target::before,
+.target::after {
+  border-radius: 0;
+}
+
+/* Remove circle-shaped marker elements without touching task checkboxes */
+.targets > .node,
+.target-wrap > .node,
+.branch-stem > .node {
+  display: none !important;
+}
+
+/* The vertical timeline remains continuous and the organic branches remain. */
+
+
+/* VERSION 16 — REMOVE REMAINING CONNECTION MARKERS */
+.target::after,
+.target.left::after,
+.target.right::after {
+  display: none !important;
+  content: none !important;
+}
+
+.month-dot,
+.branch-node {
+  display: none !important;
+}
