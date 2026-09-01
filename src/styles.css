@@ -1300,3 +1300,19 @@ h1 {
 .branch-node {
   display: none !important;
 }
+
+.leaf-check.read-only {
+  cursor: default;
+}
+
+.leaf-check.read-only .check-box {
+  opacity: 0.8;
+}
+
+.leaf-check.read-only .leaf-text {
+  opacity: 0.78;
+}
+
+.leaf-check.read-only input {
+  pointer-events: none;
+}

@@ -363,7 +363,7 @@ useEffect(() => {
 
     console.log("Loaded roadmap from Supabase:", data);
 
-    const state = data?.state_data;		
+    const state = data?.state_data;
 
     if (Array.isArray(state)) {
       setRoadmap(state as Month[]);
@@ -1039,11 +1039,15 @@ useEffect(() => {
                                   key={child.id}
                                   style={{ "--leaf-index": childIndex } as React.CSSProperties}
                                 >
-                                  <label className="leaf-check">
+                                  <label className={`leaf-check ${!user ? "read-only" : ""}`}>
                                     <input
                                       type="checkbox"
                                       checked={completed.has(child.id)}
-                                      onChange={() => toggleLeaf(child.id)}
+                                      disabled={!user}
+                                      onChange={() => {
+                                        if (!user) return;
+                                        toggleLeaf(child.id);
+                                      }}
                                     />
                                     <span className="check-box">
                                       {completed.has(child.id) && <Check size={13} />}
