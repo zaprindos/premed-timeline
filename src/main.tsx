@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+import type { User } from "@supabase/supabase-js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Check, ChevronRight, RotateCcw, Plus, Trash2, Pencil, X } from "lucide-react";
@@ -323,9 +325,99 @@ function App() {
   const undoHistory = useRef<Month[][]>([]);
   const roadmapRef = useRef<Month[]>(roadmap);
 
+  const [user, setUser] = useState<User | null>(null);
+
+useEffect(() => {
+  let active = true;
+
+  supabase.auth.getUser().then(({ data }) => {
+    if (active) {
+      setUser(data.user);
+    }
+  });
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+  });
+
+  return () => {
+    active = false;
+    subscription.unsubscribe();
+  };
+}, []);
+
   useEffect(() => {
-    roadmapRef.current = roadmap;
-  }, [roadmap]);
+  async function loadRoadmap() {
+    const { data, error } = await supabase
+      .from("timeline_state")
+      .select("state_data")
+      .eq("state_key", "main")
+      .single();
+
+    if (error) {
+      console.error("Could not load roadmap from Supabase:", error);
+      return;
+    }
+
+    console.log("Loaded roadmap from Supabase:", data);
+
+    const state = data?.state_data;		
+
+    if (Array.isArray(state)) {
+      setRoadmap(state as Month[]);
+      return;
+    }
+
+    // New format: roadmap + completed tasks together.
+    if (state && typeof state === "object") {
+      if (Array.isArray(state.roadmap)) {
+        setRoadmap(state.roadmap as Month[]);
+      }
+
+      if (Array.isArray(state.completed)) {
+        setCompleted(new Set(state.completed as string[]));
+      }
+    }
+  }
+
+  loadRoadmap();
+}, []);
+
+  useEffect(() => {
+  roadmapRef.current = roadmap;	
+
+  async function saveRoadmap() {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("timeline_state")
+      .update({
+        state_data: {
+          roadmap,
+          completed: [...completed],
+        },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("state_key", "main")
+      .select("state_key")
+      .maybeSingle();
+
+    if (error) {
+      console.error("Could not save roadmap to Supabase:", error);
+      return;
+    }
+
+    if (!data) {
+      console.warn("Roadmap was not saved: this visitor does not have edit permission.");
+      return;
+    } 
+
+     console.log("Roadmap saved to Supabase");
+  }	
+
+  saveRoadmap();
+}, [roadmap, completed, user]);
 
   const commitRoadmapEdit = (updater: (current: Month[]) => Month[]) => {
     const current = roadmapRef.current;
@@ -379,6 +471,11 @@ function App() {
   const [pinned, setPinned] = useState<Set<string>>(new Set());
   const [hovered, setHovered] = useState<Set<string>>(new Set());
   const hoverCloseTimers = useRef<Record<string, number>>({});
+
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify([...completed]));
@@ -638,6 +735,28 @@ function App() {
     ),
   }));
 
+  const handleLogin = async () => {
+    setLoginError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+
+    if (error) {
+      setLoginError(error.message);
+      return;
+    }
+
+    setShowLogin(false);
+    setLoginPassword("");
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setEditMode(false);
+  };
+
   return (
     <main>
       <header className="hero">
@@ -670,21 +789,37 @@ function App() {
             Academic Timeline
           </button>
         </div>
-
         <div className="progress-card">
           <span>Overall progress</span>
           <strong>{overall}%</strong>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: `${overall}%` }} />
           </div>
+
           <div className="progress-actions">
-            <button onClick={reset}><RotateCcw size={15} /> Reset progress</button>
-            <button
-              className={editMode ? "active" : ""}
-              onClick={() => setEditMode(v => !v)}
-            >
-              <Pencil size={15} /> {editMode ? "Done editing" : "Edit roadmap"}
-            </button>
+            {user ? (
+              <>
+                <button onClick={reset}>
+                  <RotateCcw size={15} /> Reset progress
+                </button>
+
+                <button
+                  className={editMode ? "active" : ""}
+                  onClick={() => setEditMode(v => !v)}
+                >
+                  <Pencil size={15} />
+                  {editMode ? "Done editing" : "Edit roadmap"}
+                </button>
+
+                <button onClick={handleLogout}>
+                  Owner logout
+                </button>
+              </>
+            ) : (
+              <button onClick={() => setShowLogin(true)}>
+                Owner login
+    	      </button>
+            )}
           </div>
         </div>
       </header>
@@ -1057,6 +1192,67 @@ function App() {
           </div>
         </div>
       )}
+
+      {showLogin && (
+        <div
+          className="editor-backdrop"
+          onMouseDown={() => setShowLogin(false)}
+        >
+          <div
+            className="editor-modal"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <button
+              className="editor-close"
+              onClick={() => setShowLogin(false)}
+            >
+              <X size={18} />
+            </button>
+
+            <p className="editor-kicker">OWNER ACCESS</p>
+
+            <h2>Sign in to edit the timeline</h2>
+
+            <label className="editor-field">
+              <span>Email</span>
+              <input
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="Email"
+              />
+            </label>
+
+            <label className="editor-field">
+              <span>Password</span>
+              <input
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin();
+                  }
+                  }}
+                  placeholder="Password"
+                />
+            </label>
+
+           {loginError && (
+             <p style={{ color: "crimson", fontSize: "13px" }}>
+              {loginError}
+             </p>
+           )}
+
+           <button
+             className="editor-save"
+             onClick={handleLogin}
+           >
+             Sign in
+           </button>
+         </div>
+       </div>
+)}
     </main>
   );
 }
